@@ -19,5 +19,4 @@ func main() {
   
   
 	fmt.Println("Hello " + user + ", Welcome to the Jungle")
-	
 }
