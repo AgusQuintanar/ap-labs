@@ -7,10 +7,10 @@ void month_day(int year, int yearday, int *pmonth, int *pday) {
         exit(0);
     }
 
-    int isLeap = year%4 == 0 && year%100 != 0 && year%400 == 0;
+    int isLeap = year%4 == 0 && year%100 != 0 || year%400 == 0;
 
     if (yearday > (isLeap ? 366 : 365)) {
-        printf("The yearday provided is not valid.\n");
+        printf("The year day provided is not valid.\n");
         exit(0);
     }
 
