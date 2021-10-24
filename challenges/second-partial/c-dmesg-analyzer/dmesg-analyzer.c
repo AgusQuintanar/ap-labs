@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <stdbool.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define REPORT_FILE "report.txt"
 
@@ -118,15 +122,25 @@ struct Log getLog(char *line) {
     return log;
 } 
 
-void createReport() {
-    FILE *output;
-    output = fopen(REPORT_FILE, "w+");
+void createReport(char *report) {
+    int fptr = open(report, O_CREAT | O_WRONLY, 0600);
+
+    if (fptr < 0) {
+        printf("Error: tcould not create DMESG report\n");
+        return;
+    }
 
     for(int i = 0; i<MAX_LOG_TYPES; i++) {
         if(logsTable[i] != NULL){
-            fprintf(output,"%s: \n%s\n", logsTable[i]->name, logsTable[i]->logs);
+            const int SIZE = MAX_LOG_TYPES;
+            char log_type[SIZE];
+            snprintf(log_type, SIZE, "%s: \n%s\n", logsTable[i]->name, logsTable[i]->logs);
+
+            write(fptr, log_type, strlen(log_type));
         }
     }
+
+    close(fptr);
 }
 
 void analizeLog(char *logFile, char *report) {
@@ -148,7 +162,7 @@ void analizeLog(char *logFile, char *report) {
         insert(log.type, log.description);
     }
 
-    createReport();
+    createReport(report);
 
     printf("Report is generated at: [%s]\n", report);
 }
