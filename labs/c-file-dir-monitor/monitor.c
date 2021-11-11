@@ -27,7 +27,6 @@ void put(int key, const char* value);
 int inotify;
 char *events[MAX_NUM_EVENTS];
 
-char* renamedEvent[2];
 
 int monitor();
 int handleEvent(struct inotify_event *event);
@@ -80,15 +79,15 @@ int handleEvent(struct inotify_event *event){
         }
     }
     else if (event->mask & IN_MOVED_FROM) {
-        renamedEvent[0] = event->name;
-        renamedEvent[1] = path;
+        if(event->mask & IN_ISDIR) {
+            infof("[Directory Rename] -: %s/%s\n", path, event->name);
+        }
+        else {
+            infof("[File Rename] -: %s/%s\n", path, event->name);
+        }
     }
     else if (event->mask & IN_MOVED_TO) {
-        if(strcmp(renamedEvent[1], path)==0){
-            infof("[File Rename] - %s/%s -> %s/%s\n", path, renamedEvent[0] , path, event->name);
-        }
-        renamedEvent[0] = NULL;
-        renamedEvent[1] = NULL;
+        infof("-> %s/%s\n" , path, event->name);
     }
     return 0;
 }
